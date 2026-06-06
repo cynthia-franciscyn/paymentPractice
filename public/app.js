@@ -201,38 +201,58 @@ async function startPayment(payload) {
       description: orderData.description || "Order",
       order_id:    orderData.orderId,
 
-      // Called by Razorpay after the user pays successfully
+      // Called by Razorpay after the user pays successfully.
+      // Razorpay does NOT await this — errors must be caught internally.
       handler: async function (response) {
-        paymentSucceeded = true; // flag so ondismiss doesn't overwrite this
+        paymentSucceeded = true;
         showStatus("Verifying payment…");
 
-        const verifyRes = await fetch("/verify-payment", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            razorpay_order_id:   response.razorpay_order_id,
-            razorpay_payment_id: response.razorpay_payment_id,
-            razorpay_signature:  response.razorpay_signature,
-            items:               currentOrderDetails.items,
-            subtotal:            currentOrderDetails.subtotal,
-            tax:                 currentOrderDetails.tax,
-            total:               currentOrderDetails.total,
-            customerDetails:     currentOrderDetails.customerDetails,
-          }),
-        });
+        try {
+          const controller = new AbortController();
+          const timeout    = setTimeout(() => controller.abort(), 15000);
 
-        const verifyData = await verifyRes.json();
-        showStatus("");
+          const verifyRes = await fetch("/verify-payment", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            signal: controller.signal,
+            body: JSON.stringify({
+              razorpay_order_id:   response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature:  response.razorpay_signature,
+              items:               currentOrderDetails.items,
+              subtotal:            currentOrderDetails.subtotal,
+              tax:                 currentOrderDetails.tax,
+              total:               currentOrderDetails.total,
+              customerDetails:     currentOrderDetails.customerDetails,
+            }),
+          });
 
-        if (verifyRes.ok && verifyData.success) {
-          // Clear cart and form, then show success
-          Object.keys(cart).forEach(k => delete cart[k]);
-          updateCartUI();
-          resetCheckoutForm();
-          pendingBuyNow = null;
-          showOrderResult(verifyData.orderData, true);
-        } else {
-          showOrderResult(currentOrderDetails, false);
+          clearTimeout(timeout);
+          showStatus("");
+
+          // Guard against non-JSON responses (e.g. nginx 502 HTML pages)
+          let verifyData = {};
+          try { verifyData = await verifyRes.json(); } catch (_) {}
+
+          if (verifyRes.ok && verifyData.success) {
+            Object.keys(cart).forEach(k => delete cart[k]);
+            updateCartUI();
+            resetCheckoutForm();
+            pendingBuyNow = null;
+            showOrderResult(verifyData.orderData, true);
+          } else {
+            // Server error — but the payment DID go through on Razorpay's side.
+            // Never show "order not placed" here; give the customer their payment ID.
+            showStatus("Payment received! If order isn’t confirmed shortly, contact support with ID: " + response.razorpay_payment_id, false);
+          }
+
+        } catch (err) {
+          showStatus("");
+          const msg = err.name === "AbortError"
+            ? "Payment received. Server is slow — quote this ID if needed: "
+            : "Payment received. Quote this ID for support: ";
+          showStatus(msg + response.razorpay_payment_id, false);
+          console.error("Verify error:", err);
         }
       },
 
