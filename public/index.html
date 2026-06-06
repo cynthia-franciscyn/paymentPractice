@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chocolate Cake Shop</title>
+  <!-- Razorpay checkout script -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <div class="container">
+    <h1>Chocolate Cake Shop</h1>
+
+    <!-- Product Card -->
+    <div class="product-card">
+      <h2 class="product-name">Chocolate Cake</h2>
+      <p class="product-price">Price: ₹1</p>
+      <div class="product-buttons">
+        <button id="addToCartBtn">Add to Cart</button>
+        <button id="buyNowBtn">Buy Now</button>
+      </div>
+    </div>
+
+    <!-- Cart Section (hidden until item is added) -->
+    <div class="cart-section" id="cartSection">
+      <h2>Cart</h2>
+      <p>Product: <span id="cartProductName">Chocolate Cake</span></p>
+      <p>Quantity: <span id="cartQuantity">0</span></p>
+      <p>Total: ₹<span id="cartTotal">0</span></p>
+      <button id="checkoutBtn">Checkout</button>
+    </div>
+
+    <!-- Status messages -->
+    <p id="statusMsg" class="status-msg"></p>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

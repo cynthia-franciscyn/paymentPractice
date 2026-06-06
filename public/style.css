@@ -1,0 +1,101 @@
+/* Simple centered layout, no fancy styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: #f5f5f5;
+  display: flex;
+  justify-content: center;
+  padding: 40px 16px;
+}
+
+.container {
+  width: 100%;
+  max-width: 480px;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+/* Product card */
+.product-card {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.product-name {
+  font-size: 1.2rem;
+  margin-bottom: 8px;
+}
+
+.product-price {
+  margin-bottom: 16px;
+  color: #333;
+}
+
+.product-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+/* Buttons */
+button {
+  padding: 10px 18px;
+  font-size: 1rem;
+  cursor: pointer;
+  border: 1px solid #333;
+  background: #fff;
+  border-radius: 4px;
+}
+
+button:hover {
+  background: #333;
+  color: #fff;
+}
+
+/* Cart section */
+.cart-section {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 20px;
+  margin-bottom: 20px;
+  display: none; /* hidden by default, shown via JS */
+}
+
+.cart-section h2 {
+  margin-bottom: 12px;
+}
+
+.cart-section p {
+  margin-bottom: 8px;
+}
+
+#checkoutBtn {
+  margin-top: 12px;
+  background: #2d6a4f;
+  color: #fff;
+  border-color: #2d6a4f;
+}
+
+#checkoutBtn:hover {
+  background: #1b4332;
+  border-color: #1b4332;
+}
+
+/* Status message */
+.status-msg {
+  text-align: center;
+  font-weight: bold;
+  min-height: 24px;
+  color: #2d6a4f;
+}
